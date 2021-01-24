@@ -1,5 +1,8 @@
-import { Client, RichMenu as RichMenuScheme } from "@line/bot-sdk";
+import { Client, RichMenu as RichMenuSchemeType } from "@line/bot-sdk";
 import { config } from "dotenv";
+import { createReadStream } from "fs";
+import { Readable } from "stream";
+import * as RichMenuScheme from "./src/rich-menu-scheme/index";
 
 config();
 
@@ -17,10 +20,11 @@ class RichMenu {
    * @description リッチメニューの作成
    * @returns 作成されたリッチメニューのID
    */
-  async createRichMenu(richMenuScheme: RichMenuScheme): Promise<string> {
+  async createRichMenu(richMenuScheme: RichMenuSchemeType): Promise<string> {
     try {
       const richMenuId = await this.client.createRichMenu(richMenuScheme);
       console.info("リッチメニューの作成が成功しました");
+      console.info(`リッチメニューID: ${richMenuId}`);
       return richMenuId;
     } catch (err) {
       console.error("リッチメニューの作成が失敗しました");
@@ -35,7 +39,10 @@ class RichMenu {
    * @description リッチメニューへの画像の登録
    * @returns リッチメニューに画像が登録できたかのBool値
    */
-  async setRichMenuImage(richMenuId: string, img: Buffer): Promise<boolean> {
+  async setRichMenuImage(
+    richMenuId: string,
+    img: Buffer | Readable
+  ): Promise<boolean> {
     let isSuccess: boolean;
     try {
       await this.client.setRichMenuImage(richMenuId, img);
@@ -43,8 +50,54 @@ class RichMenu {
       console.info("リッチメニューへの画像の登録が成功しました");
     } catch (err) {
       isSuccess = false;
-      console.error("リッチメニューへの画像の登録が失敗しました");
       console.error(err);
+      console.error("リッチメニューへの画像の登録が失敗しました");
+    }
+    return isSuccess;
+  }
+
+  /**
+   * @param richMenuId リッチメニューID
+   * @description リッチメニュー取得
+   * @returns リッチメニュー
+   */
+  async getRichMenuList() {
+    const list = await this.client.getRichMenuList();
+    return list;
+  }
+
+  /**
+   * @param richMenuId リッチメニューID
+   * @description リッチメニューの削除
+   * @returns リッチメニューが削除できたかのBool値
+   */
+  async deleteRichMenu(richMenuId: string) {
+    let isSuccess: boolean;
+    try {
+      await this.client.deleteRichMenu(richMenuId);
+      isSuccess = true;
+      console.info("リッチメニューの削除が成功しました");
+    } catch (err) {
+      isSuccess = false;
+      console.error("リッチメニューの削除が失敗しました");
+    }
+    return isSuccess;
+  }
+
+  /**
+   * @param richMenuId リッチメニューID
+   * @description デフォルトリッチメニューの設定
+   * @returns デフォルトリッチメニューが設定できたかのBool値
+   */
+  async setDefaultRichMenu(richMenuId: string) {
+    let isSuccess: boolean;
+    try {
+      await this.client.setDefaultRichMenu(richMenuId);
+      isSuccess = true;
+      console.info("デフォルトリッチメニューの設定が成功しました");
+    } catch (err) {
+      isSuccess = false;
+      console.error("デフォルトリッチメニューの設定が失敗しました");
     }
     return isSuccess;
   }
