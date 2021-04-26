@@ -1,4 +1,4 @@
-import { Client, RichMenu as RichMenuSchemeType } from "@line/bot-sdk";
+import { Client, RichMenu as RichMenuSchemeType, RichMenuResponse } from "@line/bot-sdk";
 import { config } from "dotenv";
 import { createReadStream } from "fs";
 import { Readable } from "stream";
@@ -34,6 +34,24 @@ class RichMenu {
   }
 
   /**
+   * @param richMenuScheme リッチメニューを構成するオブジェクト
+   * @description リッチメニューの作成
+   * @returns 作成されたリッチメニューのID
+   */
+  async getRichMenus(): Promise<RichMenuResponse[]> {
+    try {
+      const richMenus = await this.client.getRichMenuList();
+      console.info("リッチメニューリストの取得が成功しました");
+      console.log(richMenus);
+      return richMenus;
+    } catch (err) {
+      console.error("リッチメニューの作成が失敗しました");
+      console.error(err);
+      throw err;
+    }
+  }
+
+  /**
    * @param richMenuId リッチメニューを構成するオブジェクト
    * @param img リッチメニューに登録する画像のバイナリ
    * @description リッチメニューへの画像の登録
@@ -54,16 +72,6 @@ class RichMenu {
       console.error("リッチメニューへの画像の登録が失敗しました");
     }
     return isSuccess;
-  }
-
-  /**
-   * @param richMenuId リッチメニューID
-   * @description リッチメニュー取得
-   * @returns リッチメニュー
-   */
-  async getRichMenuList() {
-    const list = await this.client.getRichMenuList();
-    return list;
   }
 
   /**
@@ -104,3 +112,21 @@ class RichMenu {
 }
 
 const richMenu = new RichMenu(process.env.CHANNEL_ACCESS_TOKEN!);
+
+// リッチメニュー取得
+// richMenu.getRichMenus();
+
+// リッチメニュー作成
+// richMenu.createRichMenu()
+// richMenu.createRichMenu()
+
+// リッチメニュー削除
+// richMenu.deleteRichMenu();
+// richMenu.deleteRichMenu();
+
+// リッチメニュー画像セット
+// richMenu.setRichMenuImage();
+// richMenu.setRichMenuImage();
+
+// リッチメニューデフォルト設定
+// richMenu.setDefaultRichMenu()
